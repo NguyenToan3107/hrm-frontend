@@ -371,8 +371,8 @@ export default function AdminCreateModal(props: Props) {
       <div
         className="bg-white flex flex-col justify-between rounded-sm shadow-lg w-[822px] px-8 py-5"
         style={{
-          maxHeight: useDimession.height * 0.75,
-          minHeight: useDimession.height * 0.75,
+          maxHeight: useDimession.height * 0.8,
+          minHeight: useDimession.height * 0.8,
           scrollbarWidth: "none",
         }}
       >
@@ -656,7 +656,7 @@ export default function AdminCreateModal(props: Props) {
             </div>
           </form>
         </Form>
-        <div className=" flex items-center gap-x-2 w-full justify-end mt-4 ">
+        <div className=" flex items-center gap-x-2 w-full justify-end ">
           <Button
             tabIndex={15}
             onClick={onCancelForm}
