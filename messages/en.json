@@ -1,0 +1,62 @@
+{
+  "MyPage": {
+    "editButton": "Edit Profile",
+    "cancelButton": "Cancel",
+    "updateButton": "Update",
+    "clearButton": "Clear",
+    "changePasswordButton": "Change Password"
+  },
+  "Staff": {
+    "searchButton": "Search",
+    "addNewButton": "Add new",
+    "backStaffListButton": "Staff List",
+    "exportPDFButton": "Export PDF",
+    "editButton": "Edit Profile",
+    "resetPasswordButton": "Reset Password",
+    "backButton": "Back",
+    "createButton": "Create",
+    "cancelButton": "Cancel",
+    "nextButton": "Next",
+    "saveButton": "Save"
+  },
+  "Leave": {
+    "searchButton": "Search",
+    "addNewButton": "Create",
+    "adminCreateButton": "Supplementary",
+    "closeButton": "Close",
+    "cancelButton": "Cancel",
+    "backButton": "Back",
+    "createButton": "Create",
+    "updateButton": "Update",
+    "editButton": "Edit",
+    "saveButton": "Save",
+    "saveChangeButton": "Save changes",
+    "confirmButton": "Confirm",
+    "cancelRequestButton": "Cancel Request",
+    "skipCancelRequestButton": "Skip Cancel Request"
+  },
+  "Role": {
+    "searchButton": "Search",
+    "addNewButton": "Add new",
+    "clearButton": "Clear",
+    "createButton": "Create",
+    "cancelButton": "Cancel",
+    "saveButton": "Save",
+    "backToListButton": "Back to list",
+    "editButton": "Edit"
+  },
+  "Common": {
+    "yesButton": "Yes",
+    "okButton": "OK",
+    "noButton": "No",
+    "confirmButton": "Confirm",
+    "cancelButton": "Cancel",
+    "approveButton": "Approve",
+    "deleteButton": "Delete",
+    "skipButton": "Skip",
+    "activeButton": "Active",
+    "inactiveButton": "Inactive",
+    "closeButton": "Close",
+    "logoutButton": "Logout"
+  }
+}

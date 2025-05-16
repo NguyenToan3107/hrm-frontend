@@ -1,0 +1,61 @@
+{
+  "MyPage": {
+    "editButton": "Sửa",
+    "cancelButton": "Hủy",
+    "updateButton": "Cập nhật",
+    "clearButton": "Xóa",
+    "changePasswordButton": "Đổi mật khẩu"
+  },
+  "Staff": {
+    "searchButton": "Tìm kiếm",
+    "addNewButton": "Thêm mới",
+    "backStaffListButton": "DS Nhân viên",
+    "exportPDFButton": "Xuất PDF",
+    "editButton": "Sửa Profile",
+    "resetPasswordButton": "Đặt lại mật khẩu",
+    "backButton": "Quay lại",
+    "createButton": "Tạo",
+    "cancelButton": "Hủy",
+    "nextButton": "Tiếp",
+    "saveButton": "Lưu"
+  },
+  "Leave": {
+    "searchButton": "Tìm kiếm",
+    "addNewButton": "Thêm mới",
+    "adminCreateButton": "Admin tạo đơn",
+    "closeButton": "Đóng",
+    "cancelButton": "Hủy",
+    "backButton": "Quay lại",
+    "createButton": "Tạo",
+    "updateButton": "Cập nhật",
+    "editButton": "Sửa",
+    "saveButton": "Lưu",
+    "saveChangeButton": "Lưu thay đổi",
+    "confirmButton": "Xác nhận",
+    "cancelRequestButton": "Hủy YC",
+    "skipCancelRequestButton": "Bỏ qua Hủy YC"
+  },
+  "Role": {
+    "searchButton": "Tìm kiếm",
+    "addNewButton": "Thêm mới",
+    "clearButton": "Xóa",
+    "createButton": "Tạo",
+    "cancelButton": "Hủy",
+    "saveButton": "Lưu",
+    "backToListButton": "Về danh sách",
+    "editButton": "Sửa"
+  },
+  "Common": {
+    "yesButton": "Có",
+    "okButton": "OK",
+    "noButton": "Không",
+    "cancelButton": "Hủy",
+    "approveButton": "Duyệt",
+    "deleteButton": "Xóa",
+    "skipButton": "Bỏ qua",
+    "activeButton": "Kích hoạt",
+    "inactiveButton": "Ẩn",
+    "closeButton": "Đóng",
+    "logoutButton": "Đăng xuất"
+  }
+}

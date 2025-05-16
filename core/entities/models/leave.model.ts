@@ -1,0 +1,30 @@
+export class Leave {
+  constructor(
+    public id?: string,
+    public idkey?: string,
+    public user_idkey?: string,
+    public user_status_working?: string,
+    public employee_name?: string,
+    public description?: string,
+    public cancel_request_desc?: string,
+    public salary?: string,
+    public created_at?: string,
+    public status?: string,
+    public day_leaves?: string,
+    public approver_id?: string,
+    public approver_idkey?: string,
+    public approver_name?: string,
+    public approval_date?: string,
+    public shift?: string,
+    public other_info?: string,
+    public image?: string,
+    public image_root?: string,
+    public phone?: string,
+    public user_id?: string,
+    public time_off_hours?: string,
+    public cancel_request?: string,
+    public updated_at?: string,
+    public last_year_time_off?: string,
+    public allocated_hour?: string
+  ) {}
+}
