@@ -25,6 +25,11 @@ export enum LeaveType {
   Paid = "Paid",
 }
 
+export enum DayOffType {
+  Working = "Working",
+  Off = "Off",
+}
+
 export enum FormModeType {
   EDIT = 1,
   VIEW = 0,
@@ -68,6 +73,11 @@ export enum SalaryValue {
   PaidLeave = 1,
   UnPaidLeave = 0,
   UnPaidLeaveHalf = 2,
+}
+
+export enum StatusDayOffValue {
+  WorkingDayOff = 1,
+  NotWorkingDayOff = 0,
 }
 
 export enum ShiftValue {

@@ -5,6 +5,8 @@ export class DayOff {
     public description?: string,
     public day_off?: string,
     public status?: "0" | "1" | "none",
-    public updated_at?: string
+    public updated_at?: string,
+    public created_at?: string,
+    public salary?: string
   ) {}
 }

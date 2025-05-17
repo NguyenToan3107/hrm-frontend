@@ -116,6 +116,17 @@ export const LEAVE_STATUS = [
   },
 ];
 
+export const DAY_OFF_STATUS = [
+  {
+    value: "0",
+    name: "Off",
+  },
+  {
+    value: "1",
+    name: "Working",
+  },
+];
+
 export const SHIFT_STATUS = [
   {
     value: "0",
@@ -180,6 +191,13 @@ export const SIDEBAR_ITEMS: SideBarItemProps[] = [
     title: "My Page",
     route: "/my-page",
     permission: ["mypage"],
+  },
+  {
+    icon: LeavesIcon,
+    iconActive: LeavesIconActive,
+    title: "Day Offs",
+    route: "/dayOffs",
+    permission: ["staff_master"],
   },
   {
     icon: LeavesIcon,

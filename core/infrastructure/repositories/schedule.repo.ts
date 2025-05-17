@@ -4,9 +4,12 @@ import {
   DeleteDayOffParams,
   deleteDayOffRequest,
   getDatOffListRequest,
+  getDatOffRequest,
+  getDatOffsRequest,
   getDayOffForNotification,
   GetDayOffListParams,
   GetDayOffParams,
+  GetDayOffsParams,
   UpdateDayOffParams,
   updateDayOffRequest,
 } from "@/apis/modules/schedule";
@@ -36,7 +39,16 @@ export class ScheduleRepositoryImpl implements ScheduleRepository {
 
   async getDayOff(params: GetDayOffParams): Promise<CommonResponse | null> {
     try {
-      const response: any = await this.getDayOff(params);
+      const response: any = await getDatOffRequest(params);
+      return response;
+    } catch (error: any) {
+      return error;
+    }
+  }
+
+  async getDayOffs(params: GetDayOffsParams): Promise<CommonResponse | null> {
+    try {
+      const response: any = await getDatOffsRequest(params);
       return response;
     } catch (error: any) {
       return error;

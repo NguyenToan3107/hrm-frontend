@@ -43,19 +43,19 @@ export default function ExportPDFPage(props: Props) {
     >
       <div className="flex flex-row items-start justify-between mb-4">
         <p className="flex w-fit text-[14px] font-bold text-center">
-          {dataExport?.month}月度勤務管理表(HANOI社員用)
+          Bảng chấm công tháng {dataExport?.month} (HANOI)
         </p>
         <div className="flex flex-col flex-1 pl-4">
           <div className="flex flex-row w-full border border-transparent border-b-black items-start">
             <div className="flex flex-row w-[140px]">
-              <p className="text-[11px] w-fit text-left font-bold">会社名：</p>
+              <p className="text-[11px] w-fit text-left font-bold">Công ty：</p>
               <p className="text-[11px] font-bold flex-1 text-center pr-1">
                 {dataExport?.user?.department?.[0]}
               </p>
             </div>
             <div className="flex flex-row flex-1 justify-start">
               <p className="text-[11px] text-center font-bold w-[56px]">
-                社員番号：
+                Mã NV：
               </p>
               <p className="text-[11px] font-semibold flex-1 text-center items-center">
                 {dataExport?.user?.idkey}
@@ -65,14 +65,16 @@ export default function ExportPDFPage(props: Props) {
 
           <div className="flex flex-row w-full border border-transparent border-b-black items-start pt-1">
             <div className="flex flex-row w-[140px]">
-              <p className="text-[11px] w-fit text-left font-bold">部署名：</p>
+              <p className="text-[11px] w-fit text-left font-bold">
+                Phòng ban：
+              </p>
               <p className="text-[11px] font-semibold flex-1 text-center pr-1">
-                設計事業部
+                IT
               </p>
             </div>
             <div className="flex flex-row flex-1 justify-start">
               <p className="text-[11px] text-center font-bold w-[56px]">
-                氏名：
+                Họ tên：
               </p>
               <p className="text-[11px] font-normal flex-1 text-center items-center">
                 {dataExport?.user?.fullname}
