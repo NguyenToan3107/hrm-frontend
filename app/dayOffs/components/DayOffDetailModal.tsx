@@ -1,13 +1,11 @@
 "use client";
-import { getCommonsRequest } from "@/apis/modules/common";
-import { CreateDayOffParams } from "@/apis/modules/schedule";
+import { GetDayOffParams, UpdateDayOffParams } from "@/apis/modules/schedule";
 import DefaultImage from "@/app/assets/avatar/avatar_default.svg";
 import { AlertDialogCancelLeaveButton } from "@/components/common/alert-dialog/AlertDialogCancelLeaveButton";
 import { AlertDialogSubmitFormButton } from "@/components/common/alert-dialog/AlertDialogSubmitFormButton";
 import { StyledMessageAlertDialog } from "@/components/common/alert-dialog/StyledMessageAlertDialog";
 import StyledAvatarPreview from "@/components/common/StyledAvatarPreview";
 import { StyledDatePicker } from "@/components/common/StyledDatePicker";
-import StyledIconLoading from "@/components/common/StyledIconLoading";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -24,35 +22,36 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ShowMyPageUseCase } from "@/core/application/usecases/my-page/showMyPage.usecase";
-import { CreateDayOffUseCase } from "@/core/application/usecases/schedule/createDayOff.usecase";
+import { GetDayOffUseCase } from "@/core/application/usecases/schedule/getDayOff.usecase";
+import { UpdateDayOffUseCase } from "@/core/application/usecases/schedule/updateDayOff.usecase";
+import { DayOff } from "@/core/entities/models/dayoff.model";
 import { ScheduleRepositoryImpl } from "@/core/infrastructure/repositories/schedule.repo";
-import { UserRepositoryImpl } from "@/core/infrastructure/repositories/user.repo";
 import { toast } from "@/hooks/use-toast";
 import useWindowSize from "@/hooks/useWindowSize";
-import { useCommonStore } from "@/stores/commonStore";
 import { useUserStore } from "@/stores/userStore";
+import { FormModeType } from "@/utilities/enum";
 import { formatDateToString } from "@/utilities/format";
 import { convertHourToDay } from "@/utilities/helper";
-import {
-  ACCESS_TOKEN_KEY,
-  DAY_OFF_STATUS,
-  MAX_LENGTH_TEXT,
-} from "@/utilities/static-value";
+import { DAY_OFF_STATUS, MAX_LENGTH_TEXT } from "@/utilities/static-value";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getCookie } from "cookies-next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { twMerge } from "tailwind-merge";
 import { z } from "zod";
 
 interface Props {
   isOpen: boolean;
   onClose(): void;
+  idLeave: number | undefined;
   setLoading(value: boolean): void;
   loading: boolean;
 }
+
+const scheduleRepo = new ScheduleRepositoryImpl();
+const getDayOffUseCase = new GetDayOffUseCase(scheduleRepo);
+const updateDayOffDetailUseCase = new UpdateDayOffUseCase(scheduleRepo);
 
 const formSchema = z.object({
   dayOffDate: z.union([
@@ -76,141 +75,125 @@ const formSchema = z.object({
   status: z.string().trim(),
 });
 
-const scheduleRepo = new ScheduleRepositoryImpl();
-const createDayOffsUseCase = new CreateDayOffUseCase(scheduleRepo);
-const userRepo = new UserRepositoryImpl();
-const showMyPage = new ShowMyPageUseCase(userRepo);
-export default function CreateDayOffModal(props: Props) {
-  const { isOpen, onClose } = props;
-  const { user, setUser } = useUserStore();
-  const i18nLeave = useTranslations("Leave");
+export default function DayOffDetailModal(props: Props) {
+  const { isOpen, onClose, idLeave, setLoading } = props;
+  const [dayOff, setDayOff] = useState<DayOff>();
+  const formLeaveRef = useRef<any>(null);
+  const useDimession = useWindowSize();
+  const { user } = useUserStore();
   const router = useRouter();
 
-  const { updateRolesData, updateDepartmentData, updateApproveUsersData } =
-    useCommonStore((state) => state);
-  const useDimession = useWindowSize();
-  const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState(FormModeType.VIEW); // 0: view, 1: edit
   const [openSubmitDialog, setOpenSubmitDialog] = useState(false);
   const [alertDialogMessage, setAlertDialogMessage] = useState(false);
+  // const [loadingEdit, setLoadingEdit] = useState(false);
+  const i18nLeave = useTranslations("Leave");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      dayOffDate: new Date(),
-      description: "",
-      status: DAY_OFF_STATUS[0].value,
-      title: "",
+      dayOffDate: "",
+      status: undefined,
+      description: undefined,
+      title: undefined,
     },
   });
 
-  async function onSubmit() {
-    setOpenSubmitDialog(true);
-  }
+  const isCreateLeavebutton = useMemo(() => {
+    const userRole = user?.role;
+    return userRole?.permissions?.includes("leave_create");
+  }, []);
 
-  const goToErrorPage = () => {
-    setAlertDialogMessage(false);
-    router.replace("/error");
-  };
-
-  const onSubmitForm = async () => {
+  const onLoadDayOffDetail = async () => {
     try {
       setLoading(true);
-      const data = form.getValues();
-      const createParams: CreateDayOffParams = {
-        title: data.title,
-        description: data.description,
-        status: data.type == "0" ? "0" : "1",
-        day_off: formatDateToString(data.dayOffDate || "") || "",
-      };
-      const response = await createDayOffsUseCase.execute(createParams);
-      if (response?.code == 1) {
-        toast({
-          description: "Create day off failed",
-          color: "bg-red-100",
-        });
-      } else {
-        toast({
-          description: "Create day off successfully",
-          color: `bg-blue-200`,
-        });
-        onClose();
-      }
-      setLoading(false);
+      const params: GetDayOffParams = { id: idLeave };
+      const response = await getDayOffUseCase.execute(params);
+      setDayOff(response?.data);
+      form.setValue("dayOffDate", response?.data?.day_off);
+      form.setValue("status", response?.data?.status);
+      form.setValue("description", response?.data?.description || "");
+      form.setValue("title", response?.data?.title || "");
     } catch (error) {
     } finally {
       setLoading(false);
     }
   };
 
-  const isSameDate = (date1: Date, date2: Date): boolean => {
-    return (
-      date1.getFullYear() === date2.getFullYear() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getDate() === date2.getDate()
-    );
+  const onSetEditMode = async () => {
+    formLeaveRef.current?.toggleDisable(false);
+    setMode(FormModeType.EDIT);
+  };
+
+  const onUpdateFormLeave = () => {
+    setOpenSubmitDialog(true);
+  };
+
+  const onUpdateLeave = async () => {
+    try {
+      setLoading(true);
+      const data = form.getValues();
+      if (!dayOff?.id) return;
+
+      const updateParams: UpdateDayOffParams = {
+        id: dayOff?.id,
+        updated_at: dayOff?.updated_at || "",
+        description: data.description,
+        status: data.status,
+        day_off: data.dayOffDate,
+        title: data.title,
+      };
+      const result = await updateDayOffDetailUseCase.execute(updateParams);
+      if (result?.code == 0) {
+        toast({
+          description: "Update day off information successfully",
+          color: `bg-blue-200`,
+        });
+        onClose();
+      } else {
+        toast({
+          description: "Update day off information failed",
+          color: "bg-red-100",
+        });
+      }
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const goToErrorPage = () => {
+    setAlertDialogMessage(false);
+    router.replace("/error");
   };
 
   const isDirty = useMemo(() => {
-    const currentValues = form.getValues();
-    return (
-      currentValues.description?.trim() !== "" ||
-      !isSameDate(new Date(currentValues.dayOffDate), new Date()) ||
-      currentValues.status !== DAY_OFF_STATUS[0].value ||
-      currentValues.title?.trim() !== ""
-    );
+    const values = form.getValues();
+    const title = dayOff?.title ? dayOff?.title?.trim() : "";
+    return dayOff
+      ? values?.description?.trim() !== dayOff?.description?.trim() ||
+          values?.title?.trim() !== title ||
+          String(values?.status) !== String(dayOff?.status) ||
+          formatDateToString(values?.dayOffDate) !== dayOff?.day_off
+      : false;
   }, Object.values(form.watch()));
 
-  const reloadMyPage = async () => {
-    try {
-      const response: any = await showMyPage.execute();
-      setUser(response.data);
-    } catch (error) {}
-  };
-
-  const getCommonData = async () => {
-    try {
-      const token = getCookie(ACCESS_TOKEN_KEY);
-      if (token) {
-        const common: any = await getCommonsRequest(token);
-        if (common && common.data.roles) {
-          const formatted = common.data.roles.map((i: any) => {
-            return {
-              value: i.role_name?.toLowerCase?.(),
-              name: i.role_name,
-              description: i.description,
-            };
-          });
-          updateRolesData(formatted);
-        }
-
-        if (common && common.data.departments) {
-          updateDepartmentData(common.data.departments);
-        }
-
-        if (common && common.data.approve_users) {
-          updateApproveUsersData(common.data.approve_users);
-        }
-      }
-    } catch (error) {}
-  };
-
   useEffect(() => {
-    reloadMyPage();
-    getCommonData();
+    onLoadDayOffDetail();
   }, []);
 
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-10">
       <div
-        className="bg-white flex flex-col justify-between rounded-sm shadow-lg w-[864px] px-8 py-5"
+        className="bg-white flex flex-col justify-between rounded-sm shadow-lg w-[864px] px-8 py-4"
         style={{
           maxHeight: useDimession.height * 0.8,
           minHeight: useDimession.height * 0.8,
           scrollbarWidth: "none",
         }}
       >
-        <div className="flex justify-center">
+        <div className="flex justify-center items-end gap-2">
           <h2 className="text-xl font-bold">Day Off Infomation</h2>
         </div>
         <div className="flex flex-col items-start w-full">
@@ -261,8 +244,8 @@ export default function CreateDayOffModal(props: Props) {
                     </td>
                     <td className="text-[14px] font-normal leading-6 px-2">
                       {convertHourToDay(
-                        user.time_off_hours,
-                        user.last_year_time_off
+                        user?.time_off_hours,
+                        user?.last_year_time_off
                       )}
                     </td>
                   </tr>
@@ -279,17 +262,19 @@ export default function CreateDayOffModal(props: Props) {
             </div>
           </div>
         </div>
-
         <h3 className="font-bold mt-3 mb-3">Day Off Detail</h3>
         <div
-          className="flex flex-col items-start w-full h-full overflow-y-auto flex-1"
+          className={twMerge(
+            "flex flex-col items-start w-full h-full overflow-y-auto flex-1 p-2  rounded-sm",
+            mode == FormModeType.VIEW && `bg-orange-50`
+          )}
           style={{
             scrollbarWidth: "none",
           }}
         >
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(onSubmit)}
+              onSubmit={form.handleSubmit(onUpdateFormLeave)}
               className="space-y-8 w-full"
             >
               <div className="flex flex-col h-full">
@@ -300,7 +285,7 @@ export default function CreateDayOffModal(props: Props) {
                     render={({ field, fieldState }) => {
                       return (
                         <FormItem>
-                          <div className="rounded-sm px-1 border border-[#A2A1A8] w-full laptop:w-[242px]">
+                          <div className="bg-white rounded-sm px-1 border border-[#A2A1A8] w-full laptop:w-[242px]">
                             <FormLabel>Date</FormLabel>
                             <FormControl tabIndex={11}>
                               <StyledDatePicker
@@ -324,7 +309,7 @@ export default function CreateDayOffModal(props: Props) {
                     name="status"
                     render={({ field, fieldState }) => (
                       <FormItem>
-                        <div className="rounded-sm p-1 border border-[#A2A1A8] w-full laptop:w-[242px]">
+                        <div className="bg-white rounded-sm p-1 border border-[#A2A1A8] w-full laptop:w-[242px]">
                           <FormLabel>Status</FormLabel>
                           <Select
                             value={field.value}
@@ -375,7 +360,7 @@ export default function CreateDayOffModal(props: Props) {
                   name="title"
                   render={({ field, fieldState }) => (
                     <FormItem>
-                      <div className="flex flex-col rounded-sm p-1 border border-[#A2A1A8] w-full">
+                      <div className="bg-white flex flex-col rounded-sm p-1 border border-[#A2A1A8] w-full">
                         <div className="flex flex-row items-center">
                           <FormLabel>Title</FormLabel>
                           <p className={"text-red-500 leading-none"}>*</p>
@@ -412,7 +397,7 @@ export default function CreateDayOffModal(props: Props) {
                   name="description"
                   render={({ field, fieldState }) => (
                     <FormItem>
-                      <div className="flex flex-col rounded-sm p-1 border border-[#A2A1A8] w-full">
+                      <div className=" bg-white flex flex-col rounded-sm p-1 border border-[#A2A1A8] w-full">
                         <div className="flex flex-row items-center">
                           <FormLabel>Description</FormLabel>
                           <p className={"text-red-500 leading-none"}>*</p>
@@ -450,43 +435,64 @@ export default function CreateDayOffModal(props: Props) {
             </form>
           </Form>
         </div>
-        <div className=" flex items-center gap-x-2 w-full justify-end">
-          {isDirty ? (
-            <AlertDialogCancelLeaveButton
-              tabIndex={16}
-              isOpen={true}
-              onClose={props.onClose}
-            />
-          ) : (
+        {mode == FormModeType.EDIT ? (
+          <div className="flex flex-row justify-end gap-5 mt-10">
+            {isDirty ? (
+              <AlertDialogCancelLeaveButton
+                tabIndex={16}
+                isOpen={true}
+                onClose={onClose}
+              />
+            ) : (
+              <Button
+                tabIndex={1}
+                className="p-0 m-0 laptop:w-[152px] h-[50px] font-normal text-[16px] border bg-white border-[#A2A1A880] hover:bg-gray-100 rounded-[10px]"
+                type="button"
+                onClick={onClose}
+              >
+                {i18nLeave("cancelButton")}
+              </Button>
+            )}
             <Button
-              onClick={props.onClose}
-              tabIndex={16}
+              tabIndex={2}
+              className="p-0 m-0 laptop:w-[152px] h-[50px] font-normal text-white text-[16px] border bg-primary border-[#A2A1A880] hover:bg-primary-hover rounded-[10px]"
+              type="button"
+              onClick={onUpdateFormLeave}
+            >
+              {i18nLeave("updateButton")}
+            </Button>
+          </div>
+        ) : (
+          <div className="flex flex-row justify-end gap-5 mt-10">
+            <Button
+              tabIndex={3}
               className="p-0 m-0 laptop:w-[152px] h-[50px] font-normal text-[16px] border bg-white border-[#A2A1A880] hover:bg-gray-100 rounded-[10px]"
               type="button"
+              onClick={onClose}
             >
-              {i18nLeave("cancelButton")}
+              {i18nLeave("closeButton")}
             </Button>
-          )}
-          <Button
-            variant={"default"}
-            onClick={onSubmit}
-            tabIndex={17}
-            className=" text-white bg-primary p-0 m-0 laptop:w-[152px] h-[50px] font-normal text-[16px] border border-[#A2A1A880] hover:bg-primary-hover rounded-[10px]"
-            type="submit"
-          >
-            {loading && <StyledIconLoading />}
-            {i18nLeave("createButton")}
-          </Button>
-        </div>
+
+            {isCreateLeavebutton && (
+              <Button
+                onClick={onSetEditMode}
+                tabIndex={9}
+                className="p-0 m-0 laptop:w-[152px] h-[50px] font-normal text-white text-[16px] hover:bg-primary-hover rounded-[10px]"
+                type="button"
+              >
+                {i18nLeave("editButton")}
+              </Button>
+            )}
+          </div>
+        )}
       </div>
       <AlertDialogSubmitFormButton
         tabIndex={16}
         title={"Submit form"}
-        onConfirm={onSubmitForm}
+        onConfirm={onUpdateLeave}
         // mode={props.mode}
         open={openSubmitDialog}
         onOpenChange={setOpenSubmitDialog}
-        description={"Be sure to submit the information on the form"}
       />
       <StyledMessageAlertDialog
         title="Notification"

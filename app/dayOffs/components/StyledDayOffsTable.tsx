@@ -1,7 +1,6 @@
 "use client";
-import { GetDayOffListParams, GetDayOffsParams } from "@/apis/modules/schedule";
+import { GetDayOffsParams } from "@/apis/modules/schedule";
 import IconDetail from "@/app/assets/icons/iconViewDetail.svg";
-import LeaveDetailModal from "@/app/leaves/components/LeaveDetailModal";
 import StyledHeaderColumn from "@/components/common/StyledHeaderColumn";
 import StyledNoDataGrid from "@/components/common/StyledNoDataGrid";
 import StyledOverlay from "@/components/common/StyledOverlay";
@@ -10,7 +9,6 @@ import { DayOff } from "@/core/entities/models/dayoff.model";
 import { ScheduleRepositoryImpl } from "@/core/infrastructure/repositories/schedule.repo";
 import useWindowSize from "@/hooks/useWindowSize";
 import { useScheduleStore } from "@/stores/scheduleStore";
-import { useUserStore } from "@/stores/userStore";
 import {
   CountryType,
   DayOffType,
@@ -21,8 +19,10 @@ import {
 } from "@/utilities/enum";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { isMobile } from "react-device-detect";
+import DayOffDetailModal from "@/app/dayOffs/components/DayOffDetailModal";
+import { ALertDialogDeleteDayOff1 } from "@/components/common/alert-dialog/AlertDialogDeleteDayOff1";
 
 const scheduleRepo = new ScheduleRepositoryImpl();
 const getDayOffsUseCase = new GetDayOffsUseCase(scheduleRepo);
@@ -34,24 +34,15 @@ interface Props {
 }
 
 export default function StyledDayOffsTable(props: Props) {
-  const { loading, setLoading, currentPage } = props;
+  const { loading, setLoading } = props;
   const windowSize = useWindowSize();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [isIdLeave, setIsIdLeave] = useState<number | undefined>();
   const [isLoadingLeaveDetail, setIsLoadingLeaveDetail] = useState(false);
   const router = useRouter();
-  const { user } = useUserStore();
   const { dayOffList, updateDayOffListData, searchParams, updateSearchParams } =
     useScheduleStore((state) => state);
-
-  const isExecuteLeavebutton = useMemo(() => {
-    const userRole = user?.role;
-    return userRole?.permissions?.includes("leave_execute");
-  }, []);
-
-  //   const { leaveList, searchParams, updateSearchParams, updateLeaveListData } =
-  //     useLeaveStore((state) => state);
 
   const goToDetailPage = (idLeave: number) => {
     setIsIdLeave(idLeave);
@@ -149,17 +140,17 @@ export default function StyledDayOffsTable(props: Props) {
       <table className="overflow-y-none overscroll-x-none max-h-screen overscroll-none w-full border-separate border-spacing-0 relative">
         <thead className="border-border border-b sticky top-0">
           <tr className=" align-center bg-white ">
-            {/* <th
-              onClick={() => onClickColumnHeader("fullname")}
+            <th
+              onClick={() => onClickColumnHeader("title")}
               className="text-[16px] text-white bg-primary pl-2 font-medium align-center min-w-[260px] w-[260px] laptop:min-w-[300px] laptop:w-[300px] text-start hover:bg-primary-hover hover:cursor-pointer border-b "
             >
               <StyledHeaderColumn
-                columnName={`Employee`}
-                columnNameId="fullname"
+                columnName={`Title`}
+                columnNameId="title"
                 currentSortedColumnId={currentSortedColumn}
                 direction={sortDirection}
               />
-            </th> */}
+            </th>
             <th
               onClick={() => onClickColumnHeader("description")}
               className="text-[16px] text-white bg-primary pl-2 font-medium align-center text-start min-w-[300px] hover:bg-primary-hover hover:cursor-pointer  border-b"
@@ -228,23 +219,9 @@ export default function StyledDayOffsTable(props: Props) {
                   key={dayOff?.id ? dayOff?.id.toString() : String(index)}
                   className={`overflow-x-auto w-screen align-center h-[52px] bg-white `}
                 >
-                  {/* <td className="pl-2 border-b border-[#F6F6F6]">
-                    <div className="flex justify-start items-center laptop:gap-x-2">
-                      <StyledAvatarPreview
-                        image={
-                          !leave?.image
-                            ? DefaultImage
-                            : `${process.env.NEXT_PUBLIC_BASE_URL_IMAGE}${leave.image}`
-                        }
-                        className="contain-size h-8 w-8 rounded-full cursor-pointer aspect-square object-contain"
-                        height={44}
-                        width={44}
-                      />
-                      <p className=" text-[16px] font-normal pl-2">
-                        {leave.employee_name} ({leave.user_idkey})
-                      </p>
-                    </div>
-                  </td> */}
+                  <td className="pl-2 border-b border-[#F6F6F6]">
+                    {dayOff.title}
+                  </td>
                   <td className="pl-2 text-start text-[16px] whitespace-pre-wrap  max-w-[300px]  font-normal border-b border-[#F6F6F6]">
                     {dayOff.description}
                   </td>
@@ -261,7 +238,7 @@ export default function StyledDayOffsTable(props: Props) {
                   </td>
                   <td className="pl-2 text-[16px] font-normal border-b border-[#F6F6F6]">
                     <div className="flex flex-row gap-1">
-                      {dayOff.salary ==
+                      {dayOff.status ==
                       String(StatusDayOffValue.NotWorkingDayOff)
                         ? DayOffType.Off
                         : DayOffType.Working}
@@ -275,6 +252,11 @@ export default function StyledDayOffsTable(props: Props) {
                         src={IconDetail}
                         className="h-[24px] aspect-square hover:cursor-pointer"
                       />
+                      <ALertDialogDeleteDayOff1
+                        id={Number(dayOff.id)}
+                        updatedAt={dayOff?.updated_at || ""}
+                        onClose={onReloadData}
+                      />
                     </div>
                   </td>
                 </tr>
@@ -285,7 +267,7 @@ export default function StyledDayOffsTable(props: Props) {
       </table>
       {dayOffList.length == 0 && !loading && <StyledNoDataGrid />}
       {isModalOpen && (
-        <LeaveDetailModal
+        <DayOffDetailModal
           loading={isLoadingLeaveDetail}
           isOpen={isModalOpen}
           onClose={onCloseLeaveDetailModal}

@@ -49,9 +49,10 @@ export function createDayOffRequest(params: CreateDayOffParams) {
 export interface UpdateDayOffParams {
   id: number | string;
   description: string;
-  day_off: string;
-  status: "0" | "1";
+  day_off: string | Date;
+  status: string | "0" | "1";
   updated_at: string;
+  title?: string;
 }
 
 export function updateDayOffRequest(params: UpdateDayOffParams) {
