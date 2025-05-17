@@ -17,6 +17,7 @@ import {
 import { GetLeaveListParams } from "@/apis/modules/leave";
 import ArrowDownIcon from "@/app/assets/icons/icon-arrow-down.svg";
 import IconAdd from "@/app/assets/icons/iconAdd.svg";
+import IconStat from "@/app/assets/icons/IconStats1.png";
 import IconSearch from "@/app/assets/icons/iconSearch.svg";
 import StyledSelected from "@/app/staffs/components/StyledSelected";
 import { StyledDatePicker } from "@/components/common/StyledDatePicker";
@@ -39,6 +40,7 @@ import { z } from "zod";
 import AdminCreateModal from "./AdminCreateModal";
 import CreateLeaveModal from "./CreateLeavesModal";
 import { isValid } from "date-fns";
+import { AlertDialogViewLeaveDetail } from "@/components/common/alert-dialog/AlertDialogViewLeaveDetail";
 
 const leaveRepo = new LeaveRepositoryImpl();
 const getLeavesListUseCase = new GetLeavesListUseCase(leaveRepo);
@@ -83,7 +85,7 @@ interface Props {
 
 export default function SearchArea(props: Props) {
   const { setLoading, loading, setPage, currentPage } = props;
-  const { searchParams, updateLeaveListData, updateSearchParams } =
+  const { searchParams, updateLeaveListData, updateSearchParams, leaveList } =
     useLeaveStore((state) => state);
   const queryParams = useSearchParams();
 
@@ -92,6 +94,7 @@ export default function SearchArea(props: Props) {
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAdminCreateModalOpen, setIsAdminCreateModalOpen] = useState(false);
+  const [isViewLeave, setIsViewLeave] = useState(false);
   const i18nLeave = useTranslations("Leave");
 
   const isCreateLeavebutton = useMemo(() => {
@@ -230,7 +233,7 @@ export default function SearchArea(props: Props) {
         >
           <div className="flex flex-col laptop:flex-row w-full flex-1 laptop:items-center gap-x-4 gap-y-2 ">
             <div className="flex gap-x-4 flex-1">
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="type"
                 render={({ field }) => (
@@ -245,6 +248,25 @@ export default function SearchArea(props: Props) {
                       iconRight={ArrowDownIcon}
                     />
                     <FormMessage />
+                  </FormItem>
+                )}
+              /> */}
+              <FormField
+                control={form.control}
+                name="leaveId"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel className=" font-normal text-[16px]">
+                      Leave
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        tabIndex={5}
+                        placeholder="Leave ID"
+                        {...field}
+                        className=" border border-border focus:border-primary px-2 "
+                      />
+                    </FormControl>
                   </FormItem>
                 )}
               />
@@ -391,25 +413,18 @@ export default function SearchArea(props: Props) {
                 )}
               />
             </div>
-            <div className="flex gap-x-4 flex-1">
-              <FormField
-                control={form.control}
-                name="leaveId"
-                render={({ field }) => (
-                  <FormItem className="w-1/2 pr-2">
-                    <FormLabel className=" font-normal text-[16px]">
-                      Leave
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        tabIndex={5}
-                        placeholder="Leave ID"
-                        {...field}
-                        className=" border border-border focus:border-primary px-2 "
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
+            <div
+              className="bg-primary w-auto h-[40px] p-3 flex justify-center items-center cursor-pointer rounded-lg mt-6"
+              onClick={() => {
+                setIsViewLeave(true);
+              }}
+            >
+              <Image
+                src={IconStat}
+                alt=""
+                width={20}
+                height={20}
+                className=""
               />
             </div>
             <div
@@ -469,6 +484,14 @@ export default function SearchArea(props: Props) {
           </div>
         </form>
       </Form>
+      <AlertDialogViewLeaveDetail
+        open={isViewLeave}
+        onOpenChange={setIsViewLeave}
+        searchParams={searchParams}
+        onClose={() => {
+          setIsViewLeave(false);
+        }}
+      />
     </div>
   );
 }
