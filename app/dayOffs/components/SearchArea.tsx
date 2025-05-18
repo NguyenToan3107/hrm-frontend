@@ -7,14 +7,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  DAY_OFF_STATUS,
-  ITEM_PER_PAGE,
-  LEAVE_TYPE,
-} from "@/utilities/static-value";
+import { DAY_OFF_STATUS, ITEM_PER_PAGE } from "@/utilities/static-value";
 
 import ArrowDownIcon from "@/app/assets/icons/icon-arrow-down.svg";
 import IconAdd from "@/app/assets/icons/iconAdd.svg";
+import IconStat from "@/app/assets/icons/IconStats1.png";
 import IconSearch from "@/app/assets/icons/iconSearch.svg";
 import StyledSelected from "@/app/staffs/components/StyledSelected";
 import { StyledDatePicker } from "@/components/common/StyledDatePicker";
@@ -35,12 +32,13 @@ import { GetDayOffsUseCase } from "@/core/application/usecases/schedule/getDayOf
 import { ScheduleRepositoryImpl } from "@/core/infrastructure/repositories/schedule.repo";
 import { useScheduleStore } from "@/stores/scheduleStore";
 import CreateDayOffModal from "@/app/dayOffs/components/CreateDayOffModal";
+import { CountryType } from "@/utilities/enum";
+import { AlertDialogViewDayOffDetail } from "@/components/common/alert-dialog/AlertDialogViewDayOffDetail";
 
 const scheduleRepo = new ScheduleRepositoryImpl();
 const getDayOffsUseCase = new GetDayOffsUseCase(scheduleRepo);
 
 const formSchema = z.object({
-  type: z.string().optional(),
   createDate: z
     .union([
       z.string({ message: "Date of birth is required" }),
@@ -81,20 +79,21 @@ export default function SearchArea(props: Props) {
   const router = useRouter();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isViewLeave, setIsViewLeave] = useState(false);
   const i18nLeave = useTranslations("Leave");
 
   const isCreateLeavebutton = useMemo(() => {
     const userRole = user?.role;
-    return userRole?.permissions?.includes("leave_create");
+    return userRole?.permissions?.includes("dashboard_edit");
   }, []);
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       setLoading(true);
       const params: GetDayOffsParams = {
+        country: CountryType.VN,
         page: 1,
         limit: ITEM_PER_PAGE,
-        day_off_type: data.type == "-1" ? undefined : data?.type,
         status:
           !data?.status || data?.status == "-1" ? undefined : data?.status,
       };
@@ -125,7 +124,6 @@ export default function SearchArea(props: Props) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      type: "-1",
       status: "-1",
       createDate: "",
       leaveStartDate: "",
@@ -170,24 +168,6 @@ export default function SearchArea(props: Props) {
             <div className="flex gap-x-4 flex-1">
               <FormField
                 control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel className=" font-normal text-[16px]">
-                      Type
-                    </FormLabel>
-                    <StyledSelected
-                      items={[{ value: "-1", name: "All" }, ...LEAVE_TYPE]}
-                      field={field}
-                      tabIndex={1}
-                      iconRight={ArrowDownIcon}
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="status"
                 render={({ field }) => (
                   <FormItem className="flex-1">
@@ -204,16 +184,6 @@ export default function SearchArea(props: Props) {
                   </FormItem>
                 )}
               />
-            </div>
-            <div className="flex gap-x-4 flex-1">
-              <StyledMultipleDatePicker
-                form={form}
-                label="Leave date"
-                nameStartDate="leaveStartDate"
-                nameEndDate="leaveEndDate"
-              />
-            </div>
-            <div className="flex gap-x-4 flex-1">
               <FormField
                 control={form.control}
                 name={"createDate"}
@@ -238,7 +208,55 @@ export default function SearchArea(props: Props) {
                   </FormItem>
                 )}
               />
-              <div className="w-1/2"></div>
+            </div>
+            <div className="flex gap-x-4 flex-1">
+              <StyledMultipleDatePicker
+                form={form}
+                label="Leave date"
+                nameStartDate="leaveStartDate"
+                nameEndDate="leaveEndDate"
+              />
+            </div>
+            <div className="flex gap-x-4 flex-1">
+              {/* <FormField
+                control={form.control}
+                name={"createDate"}
+                render={({ field, fieldState }) => (
+                  <FormItem className="flex-1  flex  flex-col">
+                    <FormLabel className={"font-normal text-[16px]  "}>
+                      Create date
+                    </FormLabel>
+                    <FormControl>
+                      <StyledDatePicker
+                        tabIndex={2}
+                        field={field}
+                        title={""}
+                        triggerClass="flex-1 flex border rounded-md px-2"
+                      />
+                    </FormControl>
+                    {fieldState.error?.message && (
+                      <p className={"text-red-500 text-[10px]"}>
+                        {fieldState.error?.message}
+                      </p>
+                    )}
+                  </FormItem>
+                )}
+              /> */}
+              {/* <div className="w-1/2"></div> */}
+              <div
+                className="bg-primary w-auto h-[40px] p-3 flex justify-center items-center cursor-pointer rounded-lg mt-6"
+                onClick={() => {
+                  setIsViewLeave(true);
+                }}
+              >
+                <Image
+                  src={IconStat}
+                  alt=""
+                  width={20}
+                  height={20}
+                  className=""
+                />
+              </div>
             </div>
           </div>
           <div className="flex flex-col laptop:flex-row laptop:flex-1 justify-between mt-2 gap-y-2 laptop:gap-x-4">
@@ -282,6 +300,14 @@ export default function SearchArea(props: Props) {
           </div>
         </form>
       </Form>
+      <AlertDialogViewDayOffDetail
+        open={isViewLeave}
+        onOpenChange={setIsViewLeave}
+        searchParams={searchParams}
+        onClose={() => {
+          setIsViewLeave(false);
+        }}
+      />
     </div>
   );
 }

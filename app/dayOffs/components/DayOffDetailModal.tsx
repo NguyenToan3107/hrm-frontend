@@ -101,7 +101,7 @@ export default function DayOffDetailModal(props: Props) {
 
   const isCreateLeavebutton = useMemo(() => {
     const userRole = user?.role;
-    return userRole?.permissions?.includes("leave_create");
+    return userRole?.permissions?.includes("dashboard_edit");
   }, []);
 
   const onLoadDayOffDetail = async () => {

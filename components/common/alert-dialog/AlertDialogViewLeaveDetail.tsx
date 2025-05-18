@@ -28,6 +28,7 @@ export function AlertDialogViewLeaveDetail(props: Props) {
   const { open, onOpenChange, onClose, searchParams } = props;
   // const [loading, setLoading] = useState(false);
   const [leaves, setLeaves] = useState<Leave[]>();
+  const [total, setTotal] = useState<number>();
 
   const onCloseDialog = () => {
     onClose();
@@ -39,6 +40,7 @@ export function AlertDialogViewLeaveDetail(props: Props) {
       const params: GetLeaveListParams = { ...searchParams, limit: 1000 };
       const response = await getLeavesListUseCase.execute(params);
       setLeaves(response?.data);
+      setTotal(response?.totalItem);
     } catch (error: any) {
     } finally {
       //   setLoading(false);
@@ -143,12 +145,12 @@ export function AlertDialogViewLeaveDetail(props: Props) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <StyledOverlay isVisible={false} />
-      <AlertDialogContent className="gap-0 h-[560px] w-[400px] p-5 rounded-md">
-        <AlertDialogTitle className="text-[24px] font-bold h-0">
+      <AlertDialogContent className="gap-0 h-auto w-[400px] p-5 rounded-md">
+        <AlertDialogTitle className="text-[24px] font-bold h-0 mb-4">
           Statistics on leave applications
         </AlertDialogTitle>
 
-        <AlertDialogHeader className="flex justify-start text-left overflow-y-auto h-[400px] mt-6 hide-scrollbar">
+        <AlertDialogHeader className="flex justify-start text-left overflow-y-auto h-auto  mt-6 hide-scrollbar">
           <div>
             <div className="mb-4">
               <p className="font-semibold mb-1">🔍 Search Conditions:</p>
@@ -170,6 +172,7 @@ export function AlertDialogViewLeaveDetail(props: Props) {
                   {label}: {statistics.cancelCount[Number(key)] || 0}
                 </p>
               ))}
+              <p className="font-semibold mt-2">✅ Total leaves: {total}</p>
             </div>
           </div>
         </AlertDialogHeader>

@@ -20,6 +20,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import StyledStaffMasterTableMobile from "@/app/staffs/components/StyledStaffMasterTableMobile";
 import { Button } from "@/components/ui/button";
 import { SearchAreaMobile } from "@/app/staffs/components/SearchAreaMobile";
+import { AlertDialogViewStaffDetail } from "@/components/common/alert-dialog/AlertDialogViewStaffDetail";
+import IconStat from "@/app/assets/icons/IconStats1.png";
+import Image from "next/image";
+
 const userRepo = new UserRepositoryImpl();
 const getStaffListUseCase = new GetStaffListUseCase(userRepo);
 
@@ -30,6 +34,7 @@ export default function StaffScreen() {
   const windowSize = useWindowSize();
   const { sidebarStatus, updateSideBarStatus } = useCommonStore();
   const route = useRouter();
+  const [isViewLeave, setIsViewLeave] = useState(false);
 
   const { searchParams, updateStaffListData, updateSearchParams } =
     useStaffStore((state) => state);
@@ -103,6 +108,20 @@ export default function StaffScreen() {
           />
           {isMobile && (
             <div className="flex flex-row gap-x-2">
+              <div
+                className="bg-primary w-auto p-3 h-8 flex justify-center items-center cursor-pointer rounded-lg"
+                onClick={() => {
+                  setIsViewLeave(true);
+                }}
+              >
+                <Image
+                  src={IconStat}
+                  alt=""
+                  width={20}
+                  height={20}
+                  className=""
+                />
+              </div>
               <Button
                 onClick={goToCreateScreen}
                 className="w-[80px] font-normal h-8 text-white text-[12px] bg-button-create  hover:bg-button-create-hover"
@@ -161,6 +180,14 @@ export default function StaffScreen() {
           />
         </div>
       </div>
+      <AlertDialogViewStaffDetail
+        open={isViewLeave}
+        onOpenChange={setIsViewLeave}
+        searchParams={searchParams}
+        onClose={() => {
+          setIsViewLeave(false);
+        }}
+      />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
 interface ScheduleState {
+  isDirtyDayOff: boolean;
   dayOffList: DayOff[];
   reload: boolean;
   totalItems: number;
@@ -11,11 +12,13 @@ interface ScheduleState {
   updateDayOffListData: (data: DayOff[], totalItems: number) => void;
   updateReload: (reload: boolean) => void;
   updateSearchParams: (params: GetDayOffsParams) => void;
+  updateIsDirtyDayOff: (isDirtyDayOff: boolean) => void;
 }
 export const useScheduleStore = create<ScheduleState>()(
   devtools(
     persist(
       (set) => ({
+        isDirtyDayOff: false,
         dayOffList: [],
         reload: false,
         totalItems: 0,
@@ -26,6 +29,8 @@ export const useScheduleStore = create<ScheduleState>()(
           set((state) => ({ ...state, dayOffList: data, totalItems: total })),
         updateSearchParams: (params: GetDayOffsParams) =>
           set((state) => ({ ...state, searchParams: params })),
+        updateIsDirtyDayOff: (isDirtyDayOff: boolean) =>
+          set((state) => ({ ...state, isDirtyDayOff: isDirtyDayOff })),
       }),
 
       { name: "scheduleStore" }

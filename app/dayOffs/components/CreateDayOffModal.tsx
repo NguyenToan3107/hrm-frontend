@@ -124,10 +124,20 @@ export default function CreateDayOffModal(props: Props) {
       };
       const response = await createDayOffsUseCase.execute(createParams);
       if (response?.code == 1) {
-        toast({
-          description: "Create day off failed",
-          color: "bg-red-100",
-        });
+        if (
+          response.data?.DAYOFF_IS_EXIST &&
+          response.data.DAYOFF_IS_EXIST[0] == "DAYOFF_IS_EXIST"
+        ) {
+          toast({
+            description: "Day off is exist.",
+            color: "bg-red-100",
+          });
+        } else {
+          toast({
+            description: "Create day off failed",
+            color: "bg-red-100",
+          });
+        }
       } else {
         toast({
           description: "Create day off successfully",

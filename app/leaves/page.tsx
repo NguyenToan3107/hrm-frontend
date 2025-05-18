@@ -21,6 +21,9 @@ import { SearchAreaPopup } from "./components/SearchAreaPopup";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/stores/userStore";
+import Image from "next/image";
+import IconStat from "@/app/assets/icons/IconStats1.png";
+import { AlertDialogViewLeaveDetail } from "@/components/common/alert-dialog/AlertDialogViewLeaveDetail";
 
 const leaveRepo = new LeaveRepositoryImpl();
 const getLeavesListUseCase = new GetLeavesListUseCase(leaveRepo);
@@ -32,6 +35,7 @@ export default function LeavesScreen() {
   const router = useRouter();
   const totalItems = useLeaveStore((state) => state.totalItems);
   const { sidebarStatus, updateSideBarStatus } = useCommonStore();
+  const [isViewLeave, setIsViewLeave] = useState(false);
 
   const { searchParams, updateLeaveListData, updateSearchParams } =
     useLeaveStore((state) => state);
@@ -117,6 +121,20 @@ export default function LeavesScreen() {
           <StyledBreadcrumb items={[" Leaves"]} links={["/leaves"]} />
           {isMobile && (
             <div className="flex flex-row gap-x-2">
+              <div
+                className="bg-primary w-auto p-3 h-8 flex justify-center items-center cursor-pointer rounded-lg"
+                onClick={() => {
+                  setIsViewLeave(true);
+                }}
+              >
+                <Image
+                  src={IconStat}
+                  alt=""
+                  width={20}
+                  height={20}
+                  className=""
+                />
+              </div>
               {isCreateLeavebutton && (
                 <Button
                   onClick={goToCreatePage}
@@ -187,6 +205,14 @@ export default function LeavesScreen() {
           />
         </div>
       </div>
+      <AlertDialogViewLeaveDetail
+        open={isViewLeave}
+        onOpenChange={setIsViewLeave}
+        searchParams={searchParams}
+        onClose={() => {
+          setIsViewLeave(false);
+        }}
+      />
     </div>
   );
 }

@@ -8,81 +8,71 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import StyledOverlay from "@/components/common/StyledOverlay";
+import { Leave } from "@/core/entities/models/leave.model";
 import { useEffect, useMemo, useState } from "react";
-import { GetStaffListParams } from "@/apis/modules/user";
-import { UserRepositoryImpl } from "@/core/infrastructure/repositories/user.repo";
-import { GetStaffListUseCase } from "@/core/application/usecases/staff-master/getUserList.usecase";
-import { User } from "@/core/entities/models/user.model";
+import { ScheduleRepositoryImpl } from "@/core/infrastructure/repositories/schedule.repo";
+import { GetDayOffsUseCase } from "@/core/application/usecases/schedule/getDayOffs.usecase";
+import { GetDayOffsParams } from "@/apis/modules/schedule";
+import { DayOff } from "@/core/entities/models/dayoff.model";
 
 interface Props {
   open: boolean;
   onClose(): void;
   onOpenChange(open: boolean): void;
-  searchParams: GetStaffListParams;
+  searchParams: GetDayOffsParams;
 }
 
-const userRepo = new UserRepositoryImpl();
-const getStaffListUseCase = new GetStaffListUseCase(userRepo);
+const scheduleRepo = new ScheduleRepositoryImpl();
+const getDayOffsUseCase = new GetDayOffsUseCase(scheduleRepo);
 
-export function AlertDialogViewStaffDetail(props: Props) {
+export function AlertDialogViewDayOffDetail(props: Props) {
   const { open, onOpenChange, onClose, searchParams } = props;
-  const [users, setUsers] = useState<User[]>();
+  // const [loading, setLoading] = useState(false);
+  const [dayOffs, setDayOffs] = useState<DayOff[]>();
   const [total, setTotal] = useState<number>();
 
   const onCloseDialog = () => {
     onClose();
   };
 
-  const getStaffList = async () => {
+  const getLeaveList = async () => {
     try {
-      const params: GetStaffListParams = { ...searchParams, limit: 1000 };
-      const response = await getStaffListUseCase.execute(params);
-      setUsers(response?.data);
+      //   setLoading(true);
+      const params: GetDayOffsParams = { ...searchParams, limit: 1000 };
+      const response = await getDayOffsUseCase.execute(params);
+      setDayOffs(response?.data);
       setTotal(response?.totalItem);
     } catch (error: any) {
     } finally {
+      //   setLoading(false);
     }
   };
 
   useEffect(() => {
     if (searchParams) {
-      getStaffList();
+      getLeaveList();
     }
   }, [searchParams]);
 
   const conditionLabels: Record<string, string> = {
+    current_year: "Current Year",
+    country: "Country",
     sort_by: "Sort By",
     sort_order: "Sort Order",
-    position: "Position",
     status: "Status",
-    type: "Type",
-    keyword: "Keyword",
-    role: "Role",
+    day_off_type: "Day-off Type",
+    create_date: "Create Date",
+    day_off_start_date: "Start Date",
+    day_off_end_date: "End Date",
   };
 
-  const ignoredKeys = ["page", "limit"];
-  //   const statusLabels: Record<string, string> = {
-  //     -1: "All",
-  //     0: "Inactive",
-  //     1: "Active",
-  //   };
-
+  const ignoredKeys = ["page", "limit", "country"];
   const statusLabels: Record<string, string> = {
-    "-1": "All",
-    "0": "Inactive",
-    "1": "Active",
+    0: "Off",
+    1: "Working",
   };
-
-  const statusWorkingLabels: Record<string, string> = {
-    1: "Intern",
-    2: "Probation",
-    3: "Official",
-  };
-
   const valueMappers: Record<string, (value: any) => string> = {
     status: (value) => statusLabels[Number(value)] || String(value),
-    status_working: (value) =>
-      statusWorkingLabels[Number(value)] || String(value),
   };
 
   const renderSearchConditions = () => {
@@ -106,44 +96,30 @@ export function AlertDialogViewStaffDetail(props: Props) {
 
   const statistics = useMemo(() => {
     const statusLabels: Record<string, string> = {
-      0: "Inactive",
-      1: "Active",
-    };
-
-    const statusWorkingLabels: Record<string, string> = {
-      1: "Intern",
-      2: "Probation",
-      3: "Official",
+      0: "Off",
+      1: "Working",
     };
 
     const statusCount: Record<number, number> = {};
-    const statusWorkingCount: Record<number, number> = {};
 
-    users?.forEach((user: User) => {
-      if (typeof user.status === "number") {
-        statusCount[user.status] = (statusCount[user.status] || 0) + 1;
-      }
-
-      if (typeof user.status_working === "number") {
-        statusWorkingCount[user.status_working] =
-          (statusWorkingCount[user.status_working] || 0) + 1;
+    dayOffs?.forEach((leave: Leave) => {
+      if (typeof leave.status === "number") {
+        statusCount[leave.status] = (statusCount[leave.status] || 0) + 1;
       }
     });
 
     return {
       statusLabels,
-      statusWorkingLabels,
       statusCount,
-      statusWorkingCount,
     };
-  }, [users]);
+  }, [dayOffs]);
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <StyledOverlay isVisible={false} />
-      <AlertDialogContent className="gap-0 h-auto w-[400px] p-5 rounded-md">
+      <AlertDialogContent className="gap-0 h-auto  w-[400px] p-5 rounded-md">
         <AlertDialogTitle className="text-[24px] font-bold h-0 mb-4">
-          Statistics on staff applications
+          Statistics day off applications
         </AlertDialogTitle>
 
         <AlertDialogHeader className="flex justify-start text-left overflow-y-auto h-auto mt-6 hide-scrollbar">
@@ -153,22 +129,13 @@ export function AlertDialogViewStaffDetail(props: Props) {
               {renderSearchConditions()}
             </div>
             <div className="">
-              <p className="font-semibold mb-1">📋 Staff Status: </p>
+              <p className="font-semibold mb-1">📋 Day Off Status: </p>
               {Object.entries(statistics.statusLabels).map(([key, label]) => (
                 <p key={`status-${key}`}>
                   {label}: {statistics.statusCount[Number(key)] || 0}
                 </p>
               ))}
-
-              <p className="font-semibold mt-4 mb-1">⏳ Status Working:</p>
-              {Object.entries(statistics.statusWorkingLabels).map(
-                ([key, label]) => (
-                  <p key={`cancel-${key}`}>
-                    {label}: {statistics.statusWorkingCount[Number(key)] || 0}
-                  </p>
-                )
-              )}
-              <p className="font-semibold mt-2">✅ Total leaves: {total}</p>
+              <p className="font-semibold mt-2">✅ Total day off: {total}</p>
             </div>
           </div>
         </AlertDialogHeader>

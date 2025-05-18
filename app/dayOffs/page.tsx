@@ -12,8 +12,6 @@ import { useEffect, useMemo, useState } from "react";
 import { isMobile } from "react-device-detect";
 import SearchArea from "./components/SearchArea";
 import StyledDayOffsTable from "./components/StyledDayOffsTable";
-// import StyledLeavesTableMobile from "./components/StyledLeavesTableMobile";
-// import { SearchAreaPopup } from "./components/SearchAreaPopup";
 import { GetDayOffsParams } from "@/apis/modules/schedule";
 import { Button } from "@/components/ui/button";
 import { GetDayOffsUseCase } from "@/core/application/usecases/schedule/getDayOffs.usecase";
@@ -22,6 +20,11 @@ import { useScheduleStore } from "@/stores/scheduleStore";
 import { useUserStore } from "@/stores/userStore";
 import { CountryType } from "@/utilities/enum";
 import { useRouter } from "next/navigation";
+import StyledDayOffsTableMobile from "@/app/dayOffs/components/StyledDayOffsTableMobile";
+import { SearchAreaPopup } from "@/app/dayOffs/components/SearchAreaPopup";
+import Image from "next/image";
+import IconStat from "@/app/assets/icons/IconStats1.png";
+import { AlertDialogViewDayOffDetail } from "@/components/common/alert-dialog/AlertDialogViewDayOffDetail";
 
 const scheduleRepo = new ScheduleRepositoryImpl();
 const getDayOffsUseCase = new GetDayOffsUseCase(scheduleRepo);
@@ -35,6 +38,7 @@ export default function DayoffsScreen() {
   const { updateDayOffListData, updateSearchParams, totalItems, searchParams } =
     useScheduleStore((state) => state);
   const { user } = useUserStore();
+  const [isViewLeave, setIsViewLeave] = useState(false);
 
   const onPageChange = async (page: number) => {
     try {
@@ -73,16 +77,16 @@ export default function DayoffsScreen() {
   };
   const goToCreatePage = () => {
     if (isMobile) {
-      router.push(`/leaves/create-leave`);
+      router.push(`/dayOffs/create-day-off`);
     }
   };
 
   const isCreateLeavebutton = useMemo(() => {
     const userRole = user?.role;
-    return userRole?.permissions?.includes("leave_create");
+    return userRole?.permissions?.includes("dashboard_edit");
   }, [user]);
 
-  const { loading: roleLoading } = useCheckPermission(["leave_list"]);
+  const { loading: roleLoading } = useCheckPermission(["dashboard_view"]);
   if (roleLoading) return null;
 
   return (
@@ -93,9 +97,23 @@ export default function DayoffsScreen() {
         <StyledHeader />
         {/* <StyledBreadcrumb items={["Leaves"]} links={["/leaves"]} /> */}
         <div className="flex flex-row items-center justify-between pr-4 py-2">
-          <StyledBreadcrumb items={[" Leaves"]} links={["/leaves"]} />
+          <StyledBreadcrumb items={[" Day Off"]} links={["/dayOffs"]} />
           {isMobile && (
             <div className="flex flex-row gap-x-2">
+              <div
+                className="bg-primary w-auto p-3 h-8 flex justify-center items-center cursor-pointer rounded-lg"
+                onClick={() => {
+                  setIsViewLeave(true);
+                }}
+              >
+                <Image
+                  src={IconStat}
+                  alt=""
+                  width={20}
+                  height={20}
+                  className=""
+                />
+              </div>
               {isCreateLeavebutton && (
                 <Button
                   onClick={goToCreatePage}
@@ -104,12 +122,12 @@ export default function DayoffsScreen() {
                   Create
                 </Button>
               )}
-              {/* <SearchAreaPopup
+              <SearchAreaPopup
                 loading={loading}
                 setLoading={setLoading}
                 setPage={setPage}
                 currentPage={page}
-              /> */}
+              />
             </div>
           )}
         </div>
@@ -137,12 +155,11 @@ export default function DayoffsScreen() {
               />
             )}
             {isMobile ? (
-              //   <StyledLeavesTableMobile
-              //     loading={loading}
-              //     setLoading={setLoading}
-              //     currentPage={page}
-              //   />
-              ""
+              <StyledDayOffsTableMobile
+                loading={loading}
+                setLoading={setLoading}
+                currentPage={page}
+              />
             ) : (
               <StyledDayOffsTable
                 loading={loading}
@@ -159,6 +176,14 @@ export default function DayoffsScreen() {
           />
         </div>
       </div>
+      <AlertDialogViewDayOffDetail
+        open={isViewLeave}
+        onOpenChange={setIsViewLeave}
+        searchParams={searchParams}
+        onClose={() => {
+          setIsViewLeave(false);
+        }}
+      />
     </div>
   );
 }

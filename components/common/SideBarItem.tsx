@@ -11,6 +11,7 @@ import {
 import { useLeaveStore } from "@/stores/leavesStore";
 import { useReportStore } from "@/stores/reportStore";
 import { useRoleStore } from "@/stores/roleStore";
+import { useScheduleStore } from "@/stores/scheduleStore";
 import { useStaffStore } from "@/stores/staffStore";
 import { useUserStore } from "@/stores/userStore";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
@@ -39,7 +40,12 @@ const SideBarItem = (props: SideBarItemProps) => {
 
   const { clearImage } = useFileStore();
   const { isDirty } = useStaffStore((state) => state);
-  const { isDirtyRole, searchParams: searchParamRole, updateIsDirtyRole, updateSearchParams: updateSearchParamsRole } = useRoleStore((state) => state);
+  const {
+    isDirtyRole,
+    searchParams: searchParamRole,
+    updateIsDirtyRole,
+    updateSearchParams: updateSearchParamsRole,
+  } = useRoleStore((state) => state);
   const {
     sidebarStatus,
     updateSideBarStatus,
@@ -55,7 +61,14 @@ const SideBarItem = (props: SideBarItemProps) => {
   const { selectedStaffIds, updateSelectedStaffIds } = useReportStore(
     (state) => state
   );
-  const { isDirtyLeave, searchParams: searchParamsLeave ,updateIsDirtyLeave, updateSearchParams: updateSearchParamsLeave } = useLeaveStore();
+  const {
+    isDirtyLeave,
+    searchParams: searchParamsLeave,
+    updateIsDirtyLeave,
+    updateSearchParams: updateSearchParamsLeave,
+  } = useLeaveStore();
+
+  const { updateIsDirtyDayOff, isDirtyDayOff } = useScheduleStore();
 
   const isLoading = useMemo(() => {
     const userRole = user?.role;
@@ -97,7 +110,13 @@ const SideBarItem = (props: SideBarItemProps) => {
     if (props?.subRoute && props.subRoute.length > 0) {
       setOpenSubRoute(!openSubRoute);
       event.preventDefault();
-    } else if (isDirtyMyPage || isDirty || isDirtyRole || isDirtyLeave) {
+    } else if (
+      isDirtyMyPage ||
+      isDirty ||
+      isDirtyRole ||
+      isDirtyLeave ||
+      isDirtyDayOff
+    ) {
       event.preventDefault();
       setOpenCancelDialog(true);
     } else {
@@ -115,12 +134,12 @@ const SideBarItem = (props: SideBarItemProps) => {
       updateSearchParams({});
     }
     // clear search param role
-    if(searchParamRole) {
-      updateSearchParamsRole({})
+    if (searchParamRole) {
+      updateSearchParamsRole({});
     }
     // clear search param leave
-    if(searchParamsLeave) {
-      updateSearchParamsLeave({})
+    if (searchParamsLeave) {
+      updateSearchParamsLeave({});
     }
 
     if (!props?.subRoute) updateSideBarItemSelected(props.route);
@@ -142,7 +161,13 @@ const SideBarItem = (props: SideBarItemProps) => {
     event: React.MouseEvent,
     item: SideBarItemProps
   ) => {
-    if (isDirtyMyPage || isDirty || isDirtyRole || isDirtyLeave) {
+    if (
+      isDirtyMyPage ||
+      isDirty ||
+      isDirtyRole ||
+      isDirtyLeave ||
+      isDirtyDayOff
+    ) {
       event.preventDefault();
       setOpenCancelDialog(true);
     } else {
@@ -158,8 +183,8 @@ const SideBarItem = (props: SideBarItemProps) => {
       updateSearchParams({});
     }
     // clear search param role
-    if(searchParamRole) {
-      updateSearchParamsRole({})
+    if (searchParamRole) {
+      updateSearchParamsRole({});
     }
     updateSideBarItemSelected(item.route);
     if (selectedStaffIds.length > 0) {
@@ -179,9 +204,14 @@ const SideBarItem = (props: SideBarItemProps) => {
     if (isDirtyRole) {
       updateIsDirtyRole(!isDirtyRole);
     }
-    if(isDirtyLeave) {
-      updateIsDirtyLeave(!isDirtyLeave)
+    if (isDirtyLeave) {
+      updateIsDirtyLeave(!isDirtyLeave);
     }
+
+    if (isDirtyDayOff) {
+      updateIsDirtyDayOff(!isDirtyDayOff);
+    }
+
     resetEdittingStaff();
     router.push(sidebarItemSelected);
   };
