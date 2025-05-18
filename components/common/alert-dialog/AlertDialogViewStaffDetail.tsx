@@ -168,7 +168,7 @@ export function AlertDialogViewStaffDetail(props: Props) {
                   </p>
                 )
               )}
-              <p className="font-semibold mt-2">✅ Total leaves: {total}</p>
+              <p className="font-semibold mt-2">✅ Total staffs: {total}</p>
             </div>
           </div>
         </AlertDialogHeader>

@@ -30,7 +30,7 @@ import { toast } from "@/hooks/use-toast";
 import useWindowSize from "@/hooks/useWindowSize";
 import { useUserStore } from "@/stores/userStore";
 import { FormModeType } from "@/utilities/enum";
-import { formatDateToString } from "@/utilities/format";
+import { formatDateToString, formatStringToDate } from "@/utilities/format";
 import { convertHourToDay } from "@/utilities/helper";
 import { DAY_OFF_STATUS, MAX_LENGTH_TEXT } from "@/utilities/static-value";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -110,7 +110,10 @@ export default function DayOffDetailModal(props: Props) {
       const params: GetDayOffParams = { id: idLeave };
       const response = await getDayOffUseCase.execute(params);
       setDayOff(response?.data);
-      form.setValue("dayOffDate", response?.data?.day_off);
+      form.setValue(
+        "dayOffDate",
+        formatStringToDate(response?.data?.day_off || "")
+      );
       form.setValue("status", response?.data?.status);
       form.setValue("description", response?.data?.description || "");
       form.setValue("title", response?.data?.title || "");
@@ -140,7 +143,7 @@ export default function DayOffDetailModal(props: Props) {
         updated_at: dayOff?.updated_at || "",
         description: data.description,
         status: data.status,
-        day_off: data.dayOffDate,
+        day_off: formatDateToString(data.dayOffDate || "") || "",
         title: data.title,
       };
       const result = await updateDayOffDetailUseCase.execute(updateParams);
@@ -151,10 +154,20 @@ export default function DayOffDetailModal(props: Props) {
         });
         onClose();
       } else {
-        toast({
-          description: "Update day off information failed",
-          color: "bg-red-100",
-        });
+        if (
+          result?.data?.DAYOFF_IS_EXIST &&
+          result?.data.DAYOFF_IS_EXIST[0] == "DAYOFF_IS_EXIST"
+        ) {
+          toast({
+            description: "Day off is exist.",
+            color: "bg-red-100",
+          });
+        } else {
+          toast({
+            description: "Update day off information failed",
+            color: "bg-red-100",
+          });
+        }
       }
     } catch (error) {
     } finally {
@@ -289,6 +302,7 @@ export default function DayOffDetailModal(props: Props) {
                             <FormLabel>Date</FormLabel>
                             <FormControl tabIndex={11}>
                               <StyledDatePicker
+                                disabled={mode == FormModeType.VIEW}
                                 field={field}
                                 title={""}
                                 triggerClass="h-8 border-none rounded-md px-0"
@@ -315,6 +329,7 @@ export default function DayOffDetailModal(props: Props) {
                             value={field.value}
                             onValueChange={field.onChange}
                             defaultValue={field.value}
+                            disabled={mode == FormModeType.VIEW}
                           >
                             <FormControl tabIndex={12}>
                               <SelectTrigger
@@ -358,6 +373,7 @@ export default function DayOffDetailModal(props: Props) {
                 <FormField
                   control={form.control}
                   name="title"
+                  disabled={mode == FormModeType.VIEW}
                   render={({ field, fieldState }) => (
                     <FormItem>
                       <div className="bg-white flex flex-col rounded-sm p-1 border border-[#A2A1A8] w-full">
@@ -395,6 +411,7 @@ export default function DayOffDetailModal(props: Props) {
                 <FormField
                   control={form.control}
                   name="description"
+                  disabled={mode == FormModeType.VIEW}
                   render={({ field, fieldState }) => (
                     <FormItem>
                       <div className=" bg-white flex flex-col rounded-sm p-1 border border-[#A2A1A8] w-full">

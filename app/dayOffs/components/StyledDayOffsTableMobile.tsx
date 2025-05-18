@@ -7,7 +7,6 @@ import StyledNoDataGrid from "@/components/common/StyledNoDataGrid";
 import StyledOverlay from "@/components/common/StyledOverlay";
 import { GetDayOffsUseCase } from "@/core/application/usecases/schedule/getDayOffs.usecase";
 import { DayOff } from "@/core/entities/models/dayoff.model";
-import { Leave } from "@/core/entities/models/leave.model";
 import { ScheduleRepositoryImpl } from "@/core/infrastructure/repositories/schedule.repo";
 import useWindowSize from "@/hooks/useWindowSize";
 import { useScheduleStore } from "@/stores/scheduleStore";
@@ -41,11 +40,11 @@ export default function StyledDayOffsTableMobile(props: Props) {
   const { dayOffList, updateDayOffListData, searchParams, updateSearchParams } =
     useScheduleStore((state) => state);
 
-  const goToDetailPage = (leave?: Leave) => {
-    if (leave?.id) {
-      setIsIdLeave(Number(leave?.id));
+  const goToDetailPage = (dayOff?: DayOff) => {
+    if (dayOff?.id) {
+      setIsIdLeave(Number(dayOff?.id));
       if (isMobile) {
-        router.push(`/leaves/detail-leave/${leave?.id}`);
+        router.push(`/dayOffs/detail-day-off/${dayOff?.id}`);
       }
       setIsLoadingLeaveDetail(true);
     }

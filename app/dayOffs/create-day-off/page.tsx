@@ -78,7 +78,7 @@ const createDayOffsUseCase = new CreateDayOffUseCase(scheduleRepo);
 const userRepo = new UserRepositoryImpl();
 const getProfileUserUseCase = new ShowMyPageUseCase(userRepo);
 
-export default function LeaveCreateScreen() {
+export default function DayOffCreateScreen() {
   const { user, setUser } = useUserStore();
   const windowSize = useWindowSize();
   const { updateRolesData, updateApproveUsersData, updateDepartmentData } =

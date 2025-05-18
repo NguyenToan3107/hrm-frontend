@@ -4,7 +4,7 @@
   "packageManager": "yarn@1.22.22",
   "private": true,
   "scripts": {
-    "dev": "next dev -H 192.168.1.10",
+    "dev": "next dev",
     "build": "next build",
     "build:development": "env-cmd -f .env.development npm run build",
     "build:staging": "env-cmd -f .env.staging npm run build",
