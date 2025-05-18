@@ -26,7 +26,7 @@ const getLeavesListUseCase = new GetLeavesListUseCase(leaveRepo);
 
 export function AlertDialogViewLeaveDetail(props: Props) {
   const { open, onOpenChange, onClose, searchParams } = props;
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [leaves, setLeaves] = useState<Leave[]>();
 
   const onCloseDialog = () => {
@@ -142,7 +142,7 @@ export function AlertDialogViewLeaveDetail(props: Props) {
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <StyledOverlay isVisible={loading} />
+      <StyledOverlay isVisible={false} />
       <AlertDialogContent className="gap-0 h-[560px] w-[400px] p-5 rounded-md">
         <AlertDialogTitle className="text-[24px] font-bold h-0">
           Statistics on leave applications

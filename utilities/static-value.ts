@@ -14,6 +14,8 @@ import AttendanceReportActiceIcon from "@/app/assets/icons/iconAttendanceReportA
 import { SideBarItemProps } from "@/components/common/SideBarItem";
 import ReportActiveIcon from "@/app/assets/icons/iconReportAvtice.svg";
 import ReportIcon from "@/app/assets/icons/iconReport.svg";
+import CalendarIcon from "@/app/assets/icons/IconCalendar.png";
+import CalendarIconActive from "@/app/assets/icons/IconCalendarActive.png";
 import MasterIcon from "@/app/assets/icons/iconMaster.svg";
 import MasterActiveIcon from "@/app/assets/icons/iconMasterAvtice.svg";
 
@@ -154,13 +156,13 @@ export const COUNTRY = [
 ];
 
 export const JAPANESE_DAYS_OF_WEEK: { [key: number]: string } = {
-  0: "日", // Sunday
-  1: "月", // Monday
-  2: "火", // Tuesday
-  3: "水", // Wednesday
-  4: "木", // Thursday
-  5: "金", // Friday
-  6: "土", // Saturday
+  0: "Sun", // Sunday
+  1: "Mon", // Monday
+  2: "Tue", // Tuesday
+  3: "Wed", // Wednesday
+  4: "Thu", // Thursday
+  5: "Fri", // Friday
+  6: "Sat", // Saturday
 };
 
 export const GENDER = [
@@ -193,8 +195,8 @@ export const SIDEBAR_ITEMS: SideBarItemProps[] = [
     permission: ["mypage"],
   },
   {
-    icon: LeavesIcon,
-    iconActive: LeavesIconActive,
+    icon: CalendarIcon,
+    iconActive: CalendarIconActive,
     title: "Day Offs",
     route: "/dayOffs",
     permission: ["staff_master"],

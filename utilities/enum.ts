@@ -62,11 +62,18 @@ export enum JapaneseDayOfWeek {
   Saturday = "土", // Saturday
 }
 
+// export enum LeaveSalary {
+//   HalfDayLeave = "有給で0.5日休み",
+//   HalfDayNoLeave = "無給で0.5日休み",
+//   DayLeave = "有給で1日休み",
+//   DayNoLeave = "無給1日休み",
+// }
+
 export enum LeaveSalary {
-  HalfDayLeave = "有給で0.5日休み",
-  HalfDayNoLeave = "無給で0.5日休み",
-  DayLeave = "有給で1日休み",
-  DayNoLeave = "無給1日休み",
+  HalfDayLeave = "0.5 Day Paid",
+  HalfDayNoLeave = "0.5 Day Unpaid",
+  DayLeave = "1 Day Paid",
+  DayNoLeave = "1 Day Unpaid",
 }
 
 export enum SalaryValue {

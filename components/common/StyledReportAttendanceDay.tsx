@@ -30,7 +30,7 @@ const StyledReportAttendanceDay = (props: Props) => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   useEffect(() => {
-    if (row.is_working_day && row?.salary != null ) {
+    if (row.is_working_day && row?.salary != null) {
       if (row.shift === ShiftValue.ShiftMorning) {
         setStartTime(WorkTime.StartAfternoon);
         setEndTime(WorkTime.EndAfternoon);
@@ -77,18 +77,18 @@ const StyledReportAttendanceDay = (props: Props) => {
   }, [row]);
 
   const backgroundColorRow = useMemo(() => {
-    if(row?.is_weekend_day) {
+    if (row?.is_weekend_day) {
       if (row?.day_off == null || row?.day_off == 0) return "#C5D9F1";
       else {
         if (row.shift == ShiftValue.ShiftAllDay) return "#FFFFCC";
         else "#FFFFFF";
       }
     } else {
-        if (!row?.is_working_day || row.shift == ShiftValue.ShiftAllDay)
-          return "#FFFFCC";
-        else "#FFFFFF";
+      if (!row?.is_working_day || row.shift == ShiftValue.ShiftAllDay)
+        return "#FFFFCC";
+      else "#FFFFFF";
     }
-  }, [row])
+  }, [row]);
 
   return (
     <div
@@ -122,13 +122,13 @@ const StyledReportAttendanceDay = (props: Props) => {
       </div>
       <div className="flex w-[30%] h-5 border border-t-0 border-black items-center">
         <div className="w-[40%] text-[9px] h-5 border-r border-black flex items-center justify-end pr-1">
-          時間
+          Time
         </div>
         <div className="w-[30%] text-[9px] h-5 border-r border-black flex items-center justify-end pr-1">
-          時間
+          Time
         </div>
         <div className="w-[30%] text-[9px] h-5 border-black flex items-center justify-end pr-1">
-          時間
+          Time
         </div>
       </div>
       <div className="flex w-[22%] h-5 border border-t-0 border-black items-center">

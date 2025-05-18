@@ -11,7 +11,6 @@ import {
   CANCEL_REQUEST_VALUE,
   ITEM_PER_PAGE,
   LEAVE_STATUS,
-  LEAVE_TYPE,
 } from "@/utilities/static-value";
 
 import { GetLeaveListParams } from "@/apis/modules/leave";
@@ -85,7 +84,7 @@ interface Props {
 
 export default function SearchArea(props: Props) {
   const { setLoading, loading, setPage, currentPage } = props;
-  const { searchParams, updateLeaveListData, updateSearchParams, leaveList } =
+  const { searchParams, updateLeaveListData, updateSearchParams } =
     useLeaveStore((state) => state);
   const queryParams = useSearchParams();
 
