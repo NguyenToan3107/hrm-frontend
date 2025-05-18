@@ -17,6 +17,7 @@ import {
 
 import { GetStaffListParams } from "@/apis/modules/user";
 import IconAdd from "@/app/assets/icons/iconAdd.svg";
+import IconStat from "@/app/assets/icons/IconStats1.png";
 import IconSearch from "@/app/assets/icons/iconSearch.svg";
 import StyledSelected from "@/app/staffs/components/StyledSelected";
 import ArrowDownIcon from "@/app/assets/icons/icon-arrow-down.svg";
@@ -34,6 +35,7 @@ import { GetRoleListUseCase } from "@/core/application/usecases/role/getRoleList
 import { RoleRepositoryImpl } from "@/core/infrastructure/repositories/role.repo";
 import { GetRoleListParams } from "@/apis/modules/role";
 import StyledSelectedRoleName from "@/app/roles/components/StyledSelectedRoleName";
+import { AlertDialogViewStaffDetail } from "@/components/common/alert-dialog/AlertDialogViewStaffDetail";
 
 const userRepo = new UserRepositoryImpl();
 const getStaffListUseCase = new GetStaffListUseCase(userRepo);
@@ -64,6 +66,7 @@ export default function SearchArea(props: Props) {
   const [listRole, setListRole] = useState();
   const i18nStaff = useTranslations("Staff");
   const queryParams = useSearchParams();
+  const [isViewLeave, setIsViewLeave] = useState(false);
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
@@ -231,6 +234,20 @@ export default function SearchArea(props: Props) {
                 );
               }}
             />
+            <div
+              className="bg-primary w-auto h-[40px] p-3 flex justify-center items-center cursor-pointer rounded-lg mt-6"
+              onClick={() => {
+                setIsViewLeave(true);
+              }}
+            >
+              <Image
+                src={IconStat}
+                alt=""
+                width={20}
+                height={20}
+                className=""
+              />
+            </div>
           </div>
           <div className="items-center gap-x-4 flex justify-end mt-4">
             <Button
@@ -265,6 +282,15 @@ export default function SearchArea(props: Props) {
           </div>
         </form>
       </Form>
+
+      <AlertDialogViewStaffDetail
+        open={isViewLeave}
+        onOpenChange={setIsViewLeave}
+        searchParams={searchParams}
+        onClose={() => {
+          setIsViewLeave(false);
+        }}
+      />
     </div>
   );
 }
