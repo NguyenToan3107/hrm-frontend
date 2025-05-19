@@ -177,7 +177,7 @@ export default function StyledStaffMasterTable(props: Props) {
             </th>
             <th
               onClick={() => onClickColumnHeader("employee_name")}
-              className="text-[16px] text-white pl-2 bg-primary font-medium align-center text-start min-w-[280px] w-[280px] hover:bg-primary-hover hover:cursor-pointer  border-b"
+              className="text-[16px] text-white pl-2 bg-primary font-medium align-center text-start min-w-[250px] w-[250px] hover:bg-primary-hover hover:cursor-pointer  border-b"
             >
               <StyledHeaderColumn
                 columnName={`Employee Name`}
@@ -211,7 +211,7 @@ export default function StyledStaffMasterTable(props: Props) {
             </th>
             <th
               onClick={() => onClickColumnHeader("leader_name")}
-              className=" text-[16px] text-white pl-2 bg-primary font-medium align-center text-start min-w-[280px] w-[280px] hover:bg-primary-hover hover:cursor-pointer  border-b"
+              className=" text-[16px] text-white pl-2 bg-primary font-medium align-center text-start min-w-[250px] w-[250px] hover:bg-primary-hover hover:cursor-pointer  border-b"
             >
               <StyledHeaderColumn
                 columnName={"Leader Name"}

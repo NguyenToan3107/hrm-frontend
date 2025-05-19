@@ -16,10 +16,10 @@ export default function ExportPDFPage(props: Props) {
     try {
       const fileName =
         dataExport?.year +
-        "年" +
+        "_Year_" +
         dataExport?.month +
-        "月" +
-        "勤務管理表 - " +
+        "_Month" +
+        "_Work_Management - " +
         dataExport?.user?.idkey +
         " - " +
         dataExport?.user?.fullname +
