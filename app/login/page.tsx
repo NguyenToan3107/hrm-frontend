@@ -30,7 +30,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import iconEyeOn from "../assets/icons/iconEye.svg";
 import iconEyeOff from "../assets/icons/iconEyeOff.svg";
-import profilePic from "../assets/images/bgLogin1.png";
+import profilePic from "../assets/images/login3.png";
 import loginLogo from "../assets/logo/loginLogo.png";
 import { useCheckPermission } from "@/hooks/useCheckPermission";
 

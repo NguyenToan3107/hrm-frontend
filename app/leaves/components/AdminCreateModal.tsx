@@ -500,7 +500,7 @@ export default function AdminCreateModal(props: Props) {
               />
             </div>
             <h3 className="font-bold mt-3 mb-3">Leave Detail</h3>
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col h-[220px] overflow-y-auto hide-scrollbar">
               <div className="flex flex-col laptop:flex-row laptop:justify-start gap-3 pb-[18px] laptop:gap-0 laptop:gap-x-4">
                 <FormField
                   control={form.control}
